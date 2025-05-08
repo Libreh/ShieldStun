@@ -3,6 +3,7 @@
 	"id": "shieldstun",
 	"version": "${version}",
 	"name": "Shield Stun",
+	"description": "A server-side Fabric mod that fixes Minecraft bug MC-268147",
 	"authors": [
 		"Libreh"
 	],
