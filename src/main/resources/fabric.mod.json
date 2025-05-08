@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "shieldstun",
+	"version": "${version}",
+	"name": "Shield Stun",
+	"authors": [
+		"Libreh"
+	],
+	"license": "LGPLv3",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"me.libreh.shieldstun.ShieldStun"
+		]
+	},
+	"mixins": [
+		"shieldstun.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
