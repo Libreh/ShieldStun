@@ -7,14 +7,12 @@ public class ConfigCache {
     private boolean paperShieldKnockback;
 
     public ConfigCache() {
-        refresh();
-        ConfigManager.addReloadListener(this::refresh);
+        reload();
     }
 
-    void refresh() {
+    public void reload() {
         try {
-            this.stunEnabled = getConfigBoolean("enable_stuns");
-            this.paperKnockback = getConfigBoolean("paper_style_knockback");
+            this.stunEnabled = getConfigBoolean(Constants.enableStuns);
             this.paperShieldKnockback = getConfigBoolean(Constants.paperShieldKnockback);
         } catch (Exception e) {
             ShieldStun.LOGGER.error("Failed to refresh config cache, using defaults", e);

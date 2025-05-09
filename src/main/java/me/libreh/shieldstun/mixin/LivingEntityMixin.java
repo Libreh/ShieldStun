@@ -1,6 +1,7 @@
 package me.libreh.shieldstun.mixin;
 
 import me.libreh.shieldstun.config.ConfigCache;
+import me.libreh.shieldstun.config.ConfigManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -23,7 +24,7 @@ public abstract class LivingEntityMixin extends Entity {
 	private boolean shieldstun$stunHit;
 
 	@Unique
-	private static final ConfigCache CONFIG = new ConfigCache();
+	private static final ConfigCache CONFIG = ConfigManager.getConfigCache();
 
 	public LivingEntityMixin(EntityType<?> type, World world) {
 		super(type, world);
@@ -63,6 +64,6 @@ public abstract class LivingEntityMixin extends Entity {
 	private boolean shieldstun$shouldModifyKnockback() {
 		return shieldstun$stunHit
 				&& CONFIG.isStunEnabled()
-				&& CONFIG.isPaperKnockbackEnabled();
+				&& CONFIG.isPaperShieldKnockbackEnabled();
 	}
 }
