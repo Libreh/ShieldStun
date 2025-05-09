@@ -4,8 +4,7 @@ import me.libreh.shieldstun.ShieldStun;
 
 public class ConfigCache {
     private boolean stunEnabled;
-    private boolean paperKnockback;
-    private double knockbackModifier = 0.5;
+    private boolean paperShieldKnockback;
 
     public ConfigCache() {
         refresh();
@@ -16,16 +15,19 @@ public class ConfigCache {
         try {
             this.stunEnabled = getConfigBoolean("enable_stuns");
             this.paperKnockback = getConfigBoolean("paper_style_knockback");
+            this.paperShieldKnockback = getConfigBoolean(Constants.paperShieldKnockback);
         } catch (Exception e) {
             ShieldStun.LOGGER.error("Failed to refresh config cache, using defaults", e);
             this.stunEnabled = true;
-            this.paperKnockback = true;
+            this.paperShieldKnockback = true;
         }
     }
 
     public boolean isStunEnabled() { return stunEnabled; }
-    public boolean isPaperKnockbackEnabled() { return paperKnockback; }
-    public double getKnockbackModifier() { return knockbackModifier; }
+    public boolean isPaperShieldKnockbackEnabled() { return paperShieldKnockback; }
+    public double getKnockbackModifier() {
+        return 0.5;
+    }
 
     private boolean getConfigBoolean(String key) {
         try {
