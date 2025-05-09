@@ -1,5 +1,7 @@
 package me.libreh.shieldstun.config;
 
+import me.libreh.shieldstun.util.Constants;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -7,8 +9,8 @@ public class Config {
     private final Map<String, ConfigOption<?>> options = new LinkedHashMap<>();
 
     public Config() {
-        registerOption(new ConfigOption<>("enable_stuns", true, Boolean.class));
-        registerOption(new ConfigOption<>("paper_style_knockback", true, Boolean.class));
+        registerOption(new ConfigOption<>(Constants.enableStuns, true, Boolean.class));
+        registerOption(new ConfigOption<>(Constants.paperShieldKnockback, true, Boolean.class));
     }
 
     private void registerOption(ConfigOption<?> option) {
