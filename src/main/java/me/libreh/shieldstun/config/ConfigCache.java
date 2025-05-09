@@ -1,6 +1,7 @@
 package me.libreh.shieldstun.config;
 
 import me.libreh.shieldstun.ShieldStun;
+import me.libreh.shieldstun.util.Constants;
 
 public class ConfigCache {
     private boolean stunEnabled;
@@ -31,6 +32,7 @@ public class ConfigCache {
         try {
             return ConfigManager.getConfig().getBoolean(key);
         } catch (Exception e) {
+            ShieldStun.LOGGER.info("Invalid boolean config key '{}', using true", key);
             return true;
         }
     }
