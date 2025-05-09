@@ -10,13 +10,12 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ConfigManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("shieldstun.json");
+
     private static Config config;
 
     public static Config getConfig() {
@@ -24,7 +23,12 @@ public class ConfigManager {
         return config;
     }
 
-    private static final List<Runnable> RELOAD_LISTENERS = new CopyOnWriteArrayList<>();
+    private static ConfigCache configCache;
+
+    public static ConfigCache getConfigCache() {
+        if (configCache == null) configCache = new ConfigCache();
+        return configCache;
+    }
 
     public static boolean loadConfig() {
         try {
@@ -41,25 +45,10 @@ public class ConfigManager {
                     setOptionValue(option, entry.getValue());
                 }
             }
-            notifyReloadListeners();
             return true;
         } catch (Exception e) {
             ShieldStun.LOGGER.error("Failed to load config", e);
             return false;
-        }
-    }
-
-    public static void addReloadListener(Runnable listener) {
-        RELOAD_LISTENERS.add(listener);
-    }
-
-    private static void notifyReloadListeners() {
-        for (Runnable listener : RELOAD_LISTENERS) {
-            try {
-                listener.run();
-            } catch (Exception e) {
-                ShieldStun.LOGGER.error("Error in config reload listener", e);
-            }
         }
     }
 
@@ -79,6 +68,7 @@ public class ConfigManager {
             }
             Files.createDirectories(CONFIG_PATH.getParent());
             Files.writeString(CONFIG_PATH, GSON.toJson(json));
+            configCache.reload();
             return true;
         } catch (Exception e) {
             ShieldStun.LOGGER.error("Failed to save config", e);
