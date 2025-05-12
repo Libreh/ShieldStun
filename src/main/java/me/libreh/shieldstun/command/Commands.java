@@ -6,8 +6,10 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import me.libreh.shieldstun.ModInit;
 import me.libreh.shieldstun.config.ConfigManager;
 import me.libreh.shieldstun.config.ConfigOption;
+import me.libreh.shieldstun.util.Constants;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
@@ -17,21 +19,19 @@ import net.minecraft.util.Formatting;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class ShieldStunCommand {
-    private static final String MAIN_PERMISSION = "shieldstun.main";
-    private static final String RELOAD_PERMISSION = "shieldstun.reload";
+public class Commands {
     private static final int OP_LEVEL = 3;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(literal("shieldstun")
-                .requires(source -> Permissions.check(source, MAIN_PERMISSION, OP_LEVEL))
+        dispatcher.register(literal(ModInit.MOD_ID)
+                .requires(source -> Permissions.check(source, Constants.MAIN_PERMISSION, OP_LEVEL))
                 .then(createReloadCommand())
                 .then(createConfigCommands()));
     }
 
     private static LiteralCommandNode<ServerCommandSource> createReloadCommand() {
         return literal("reload")
-                .requires(source -> Permissions.check(source, RELOAD_PERMISSION, OP_LEVEL))
+                .requires(source -> Permissions.check(source, Constants.RELOAD_PERMISSION, OP_LEVEL))
                 .executes(context -> reloadConfig(context.getSource()))
                 .build();
     }
