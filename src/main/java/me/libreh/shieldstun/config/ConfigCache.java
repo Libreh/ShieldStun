@@ -1,6 +1,6 @@
 package me.libreh.shieldstun.config;
 
-import me.libreh.shieldstun.ShieldStun;
+import me.libreh.shieldstun.ModInit;
 import me.libreh.shieldstun.util.Constants;
 
 public class ConfigCache {
@@ -13,10 +13,10 @@ public class ConfigCache {
 
     public void reload() {
         try {
-            this.stunEnabled = getConfigBoolean(Constants.enableStuns);
-            this.paperShieldKnockback = getConfigBoolean(Constants.paperShieldKnockback);
+            this.stunEnabled = getConfigBoolean(Constants.ENABLE_STUNS);
+            this.paperShieldKnockback = getConfigBoolean(Constants.PAPER_SHIELD_KNOCKBACK);
         } catch (Exception e) {
-            ShieldStun.LOGGER.error("Failed to refresh config cache, using defaults", e);
+            ModInit.LOGGER.error("Failed to refresh config cache, using defaults", e);
             this.stunEnabled = true;
             this.paperShieldKnockback = true;
         }
@@ -32,7 +32,7 @@ public class ConfigCache {
         try {
             return ConfigManager.getConfig().getBoolean(key);
         } catch (Exception e) {
-            ShieldStun.LOGGER.info("Invalid boolean config key '{}', using true", key);
+            ModInit.LOGGER.info("Invalid boolean config key '{}', using true", key);
             return true;
         }
     }

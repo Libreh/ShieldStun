@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.libreh.shieldstun.ShieldStun;
+import me.libreh.shieldstun.ModInit;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.InputStreamReader;
@@ -47,7 +47,7 @@ public class ConfigManager {
             }
             return true;
         } catch (Exception e) {
-            ShieldStun.LOGGER.error("Failed to load config", e);
+            ModInit.LOGGER.error("Failed to load config", e);
             return false;
         }
     }
@@ -71,7 +71,7 @@ public class ConfigManager {
             configCache.reload();
             return true;
         } catch (Exception e) {
-            ShieldStun.LOGGER.error("Failed to save config", e);
+            ModInit.LOGGER.error("Failed to save config", e);
             return false;
         }
     }

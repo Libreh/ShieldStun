@@ -9,8 +9,8 @@ public class Config {
     private final Map<String, ConfigOption<?>> options = new LinkedHashMap<>();
 
     public Config() {
-        registerOption(new ConfigOption<>(Constants.enableStuns, true, Boolean.class));
-        registerOption(new ConfigOption<>(Constants.paperShieldKnockback, true, Boolean.class));
+        registerOption(new ConfigOption<>(Constants.ENABLE_STUNS, true, Boolean.class));
+        registerOption(new ConfigOption<>(Constants.PAPER_SHIELD_KNOCKBACK, true, Boolean.class));
     }
 
     private void registerOption(ConfigOption<?> option) {

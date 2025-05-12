@@ -11,7 +11,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"me.libreh.shieldstun.ShieldStun"
+          "me.libreh.shieldstun.ModInit"
 		]
 	},
 	"mixins": [
