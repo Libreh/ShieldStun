@@ -18,7 +18,6 @@ A minecraft bug ([MC-268147](https://bugs.mojang.com/browse/MC-268147)) from 1.1
 ### The Solution
 This mod ports PaperMC's [`skip-vanilla-damage-tick-when-shield-blocked`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241) patch to Fabric, restoring:
 - **Shield Stuns**: Rewarding aggressive playstyles more
-- **Knockback Control**: Choose between vanilla or Paper-style shield knockback
 
 ## 📥 Installation
 
@@ -36,16 +35,13 @@ Edit `config/shieldstun.json`:
 
 ```json
 {
-  "enable_stuns": true,
-  "paper_shield_knockback": true
+  "enable_stuns": true
 }
 ```
 
 | Option                   | Description                                                                  |
 |--------------------------|------------------------------------------------------------------------------|
 | `enable_stuns`           | Enables shield-stunning mechanic (true/false)                                |
-| `paper_shield_knockback` | Uses PaperMC's shield knockback instead of vanilla (recommended for PvP)     |
-
 ---
 
 ## 🎮 Commands & Permissions
