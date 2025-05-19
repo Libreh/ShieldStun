@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/github/license/Libreh/ShieldStun?style=flat-square)](LICENSE)
 [![Fabric API](https://img.shields.io/badge/Requires-Fabric%20API-blue?style=flat-square)](https://modrinth.com/mod/fabric-api)
 
-A server-side Fabric mod that fixes aims to balance the shield in PvP.
+A server-side Fabric mod that aims to balance the shield in PvP.
 
 ## 🔧 Technical Details
 
