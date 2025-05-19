@@ -23,7 +23,7 @@ public class Commands {
     private static final int OP_LEVEL = 3;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(literal(ModInit.MOD_ID)
+        dispatcher.register(literal(ModInit.ID)
                 .requires(source -> Permissions.check(source, Constants.MAIN_PERMISSION, OP_LEVEL))
                 .then(createReloadCommand())
                 .then(createConfigCommands()));
