@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ModInit implements ModInitializer {
-	public static final String MOD_ID = "shieldstun";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final String ID = "shieldstun";
+	public static final Logger LOGGER = LoggerFactory.getLogger(ID);
 
     @Override
 	public void onInitialize() {
