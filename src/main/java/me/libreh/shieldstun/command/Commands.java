@@ -3,14 +3,12 @@ package me.libreh.shieldstun.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.tree.LiteralCommandNode;
-import me.libreh.shieldstun.ModInit;
+import me.libreh.shieldstun.ShieldStun;
 import me.libreh.shieldstun.config.ConfigManager;
-import me.libreh.shieldstun.config.ConfigOption;
 import me.libreh.shieldstun.util.Constants;
 import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -22,54 +20,40 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class Commands {
     private static final int OP_LEVEL = 3;
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(literal(ModInit.ID)
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess access, CommandManager.RegistrationEnvironment environment) {
+        dispatcher.register(literal(ShieldStun.MOD_ID)
                 .requires(source -> Permissions.check(source, Constants.MAIN_PERMISSION, OP_LEVEL))
-                .then(createReloadCommand())
-                .then(createConfigCommands()));
-    }
-
-    private static LiteralCommandNode<ServerCommandSource> createReloadCommand() {
-        return literal("reload")
-                .requires(source -> Permissions.check(source, Constants.RELOAD_PERMISSION, OP_LEVEL))
-                .executes(context -> reloadConfig(context.getSource()))
-                .build();
-    }
-
-    private static LiteralCommandNode<ServerCommandSource> createConfigCommands() {
-        LiteralArgumentBuilder<ServerCommandSource> config = literal("config");
-
-        ConfigManager.getConfig().getOptions().values().forEach(option ->
-                config.then(literal(option.getKey())
+                .then(literal("reload")
+                        .requires(source -> Permissions.check(source, Constants.RELOAD_PERMISSION, OP_LEVEL))
+                        .executes(context -> reloadConfig(context.getSource()))
+                        .build())
+                .then(literal("config")
                         .then(literal("get")
-                                .executes(context -> handleConfigGet(context.getSource(), option)))
+                                .then(literal(Constants.ENABLE_STUNS)
+                                .executes(context -> configGet(context.getSource()))))
                         .then(literal("set")
-                                .then(argument("value", BoolArgumentType.bool())
-                                        .executes(context -> handleConfigSet(context, option))))));
-
-        config.then(literal("show")
-                .executes(context -> showAllConfig(context.getSource())));
-
-        return config.build();
+                                .then(literal(Constants.ENABLE_STUNS)
+                                        .then(argument("value", BoolArgumentType.bool())
+                                                .executes(context -> configSet(context.getSource(), BoolArgumentType.getBool(context, "value"))))))
+                        .then(literal("show")
+                                .executes(context -> showAllConfig(context.getSource())))));
     }
 
-    private static int handleConfigGet(ServerCommandSource source, ConfigOption<?> option) {
-        Object value = option.get();
-        sendSuccess(source, Text.literal("%s: ".formatted(option.getKey()))
-                .append(getFormattedValue(value)));
+    private static int configGet(ServerCommandSource source) {
+        sendSuccess(source, Text.literal("%s: ".formatted(Constants.ENABLE_STUNS))
+                .append(getFormattedValue(ConfigManager.getConfig().enableStuns)));
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int handleConfigSet(CommandContext<ServerCommandSource> context, ConfigOption<?> option) {
-        boolean value = BoolArgumentType.getBool(context, "value");
-        ((ConfigOption<Boolean>) option).set(value);
+    private static int configSet(ServerCommandSource source, boolean value) {
+        ConfigManager.getConfig().enableStuns = value;
 
         if (ConfigManager.saveConfig()) {
-            sendSuccess(context.getSource(),
-                    Text.literal("Set %s to ".formatted(option.getKey()))
-                            .append(getFormattedValue(value)));
+            sendSuccess(source,
+                    Text.literal("Set %s to ".formatted(Constants.ENABLE_STUNS))
+                            .append(getFormattedValue(ConfigManager.getConfig().enableStuns)));
         } else {
-            sendError(context.getSource(), "Failed to save config!");
+            sendError(source, "Error occurred while reloading config!");
         }
         return Command.SINGLE_SUCCESS;
     }
@@ -78,12 +62,8 @@ public class Commands {
         MutableText message = Text.literal("ShieldStun Config\n")
                 .styled(style -> style.withBold(true).withColor(Formatting.GOLD));
 
-        ConfigManager.getConfig().getOptions().values().forEach(option -> {
-            Object value = option.get();
-            message.append("\n")
-                    .append(Text.literal(option.getKey() + ": ").formatted(Formatting.YELLOW).styled(style -> style.withBold(false)))
-                    .append(getFormattedValue(value).styled(style -> style.withBold(false)));
-        });
+        message.append(Text.literal(Constants.ENABLE_STUNS + ": ").formatted(Formatting.YELLOW).styled(style -> style.withBold(false)))
+                .append(getFormattedValue(ConfigManager.getConfig().enableStuns).styled(style -> style.withBold(false)));
 
         source.sendFeedback(() -> message, false);
         return Command.SINGLE_SUCCESS;
@@ -91,9 +71,9 @@ public class Commands {
 
     private static int reloadConfig(ServerCommandSource source) {
         if (ConfigManager.loadConfig()) {
-            sendSuccess(source, Text.literal("Config reloaded successfully!").formatted(Formatting.GREEN));
+            sendSuccess(source, Text.literal("Reloaded config!"));
         } else {
-            sendError(source, "Failed to reload config!");
+            sendError(source, "Error occurred while reloading config!");
         }
         return Command.SINGLE_SUCCESS;
     }
