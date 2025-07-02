@@ -7,8 +7,6 @@ import me.libreh.shieldstun.ShieldStun;
 import me.libreh.shieldstun.config.ConfigManager;
 import me.libreh.shieldstun.util.Constants;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -20,7 +18,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class Commands {
     private static final int OP_LEVEL = 3;
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess access, CommandManager.RegistrationEnvironment environment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal(ShieldStun.MOD_ID)
                 .requires(source -> Permissions.check(source, Constants.MAIN_PERMISSION, OP_LEVEL))
                 .then(literal("reload")
@@ -34,14 +32,13 @@ public class Commands {
                         .then(literal("set")
                                 .then(literal(Constants.ENABLE_STUNS)
                                         .then(argument("value", BoolArgumentType.bool())
-                                                .executes(context -> configSet(context.getSource(), BoolArgumentType.getBool(context, "value"))))))
-                        .then(literal("show")
-                                .executes(context -> showAllConfig(context.getSource())))));
+                                                .executes(context -> configSet(context.getSource(), BoolArgumentType.getBool(context, "value"))))))));
     }
 
     private static int configGet(ServerCommandSource source) {
-        sendSuccess(source, Text.literal("%s: ".formatted(Constants.ENABLE_STUNS))
-                .append(getFormattedValue(ConfigManager.getConfig().enableStuns)));
+        source.sendFeedback(() -> Text.literal("%s: ".formatted(Constants.ENABLE_STUNS))
+                        .append(formatBoolean(ConfigManager.getConfig().enableStuns)),
+                false);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -49,48 +46,25 @@ public class Commands {
         ConfigManager.getConfig().enableStuns = value;
 
         if (ConfigManager.saveConfig()) {
-            sendSuccess(source,
-                    Text.literal("Set %s to ".formatted(Constants.ENABLE_STUNS))
-                            .append(getFormattedValue(ConfigManager.getConfig().enableStuns)));
+            source.sendFeedback(() -> Text.literal("Set %s to ".formatted(Constants.ENABLE_STUNS))
+                            .append(formatBoolean(ConfigManager.getConfig().enableStuns)),
+                    false);
         } else {
-            sendError(source, "Error occurred while reloading config!");
+            source.sendError(Text.literal("Error occurred while saving config!").formatted(Formatting.RED));
         }
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int showAllConfig(ServerCommandSource source) {
-        MutableText message = Text.literal("ShieldStun Config\n")
-                .styled(style -> style.withBold(true).withColor(Formatting.GOLD));
-
-        message.append(Text.literal(Constants.ENABLE_STUNS + ": ").formatted(Formatting.YELLOW).styled(style -> style.withBold(false)))
-                .append(getFormattedValue(ConfigManager.getConfig().enableStuns).styled(style -> style.withBold(false)));
-
-        source.sendFeedback(() -> message, false);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int reloadConfig(ServerCommandSource source) {
         if (ConfigManager.loadConfig()) {
-            sendSuccess(source, Text.literal("Reloaded config!"));
+            source.sendFeedback(() -> Text.literal("Reloaded config!"), false);
         } else {
-            sendError(source, "Error occurred while reloading config!");
+            source.sendError(Text.literal("Error occurred while reloading config!").formatted(Formatting.RED));
         }
         return Command.SINGLE_SUCCESS;
     }
 
-    private static MutableText getFormattedValue(Object value) {
-        if (value instanceof Boolean) {
-            return Text.literal(String.valueOf(value))
-                    .formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
-        }
-        return Text.literal(String.valueOf(value)).formatted(Formatting.WHITE);
-    }
-
-    private static void sendSuccess(ServerCommandSource source, Text text) {
-        source.sendFeedback(() -> text, false);
-    }
-
-    private static void sendError(ServerCommandSource source, String message) {
-        source.sendError(Text.literal(message).formatted(Formatting.RED));
+    private static MutableText formatBoolean(boolean value) {
+        return Text.literal(String.valueOf(value)).formatted(value ? Formatting.GREEN : Formatting.RED);
     }
 }

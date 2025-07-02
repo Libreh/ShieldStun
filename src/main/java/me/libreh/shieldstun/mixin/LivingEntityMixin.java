@@ -9,9 +9,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,9 +25,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@WrapOperation(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getDamageBlockedAmount(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)F"))
 	private float notWorking(LivingEntity instance, ServerWorld world, DamageSource source, float amount, Operation<Float> original, @Cancellable CallbackInfoReturnable<Boolean> cir) {
-		if (this.isBlocking() &&
-				source.getSource() != null && source.getSource() instanceof ServerPlayerEntity
-		) {
+		if (this.isBlocking() && source.getSource() != null && source.getSource() instanceof ServerPlayerEntity) {
 			cir.setReturnValue(false);
 		}
 		return original.call(instance, world, source, amount);
