@@ -8,6 +8,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -31,7 +32,7 @@ public class ConfigManager {
         try {
             File configFile = CONFIG_PATH.toFile();
 
-            CONFIG = configFile.exists() ? GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), "UTF-8"), Config.class) : new Config();
+            CONFIG = configFile.exists() ? GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8), Config.class) : new Config();
             saveConfig();
 
             success = true;
