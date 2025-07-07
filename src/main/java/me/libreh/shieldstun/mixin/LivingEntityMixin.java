@@ -25,7 +25,7 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@WrapOperation(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getDamageBlockedAmount(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)F"))
-	private float notWorking(LivingEntity instance, ServerWorld world, DamageSource source, float amount, Operation<Float> original, @Cancellable CallbackInfoReturnable<Boolean> cir) {
+	private float shieldStun(LivingEntity instance, ServerWorld world, DamageSource source, float amount, Operation<Float> original, @Cancellable CallbackInfoReturnable<Boolean> cir) {
 		if (this.isBlocking() && source.getSource() != null && source.getSource() instanceof ServerPlayerEntity && ConfigManager.getInstance().getConfig().enableStuns) {
 			cir.setReturnValue(false);
 		}
