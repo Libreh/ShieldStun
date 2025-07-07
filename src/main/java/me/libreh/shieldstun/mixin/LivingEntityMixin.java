@@ -3,6 +3,7 @@ package me.libreh.shieldstun.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Cancellable;
+import me.libreh.shieldstun.config.ConfigManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -25,7 +26,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@WrapOperation(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getDamageBlockedAmount(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)F"))
 	private float notWorking(LivingEntity instance, ServerWorld world, DamageSource source, float amount, Operation<Float> original, @Cancellable CallbackInfoReturnable<Boolean> cir) {
-		if (this.isBlocking() && source.getSource() != null && source.getSource() instanceof ServerPlayerEntity) {
+		if (this.isBlocking() && source.getSource() != null && source.getSource() instanceof ServerPlayerEntity && ConfigManager.getInstance().getConfig().enableStuns) {
 			cir.setReturnValue(false);
 		}
 		return original.call(instance, world, source, amount);

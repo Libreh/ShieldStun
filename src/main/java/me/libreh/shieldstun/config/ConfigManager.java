@@ -13,26 +13,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConfigManager {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("shieldstun.json");
-    private static final Config DEFAULT = new Config();
-    private static Config CONFIG;
+    public static ConfigManager INSTANCE;
 
-    public static Config getConfig() {
-        if (CONFIG == null) {
-            return DEFAULT;
-        }
-        return CONFIG;
-    }
+    private ConfigManager() {}
+    
+    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("shieldstun.json");
+    private final Config DEFAULT = new Config();
+    private Config CONFIG;
 
-    public static boolean loadConfig() {
+    public boolean loadConfig() {
         Config oldConfig = CONFIG;
         boolean success;
         CONFIG = null;
         try {
+            Config config;
             File configFile = CONFIG_PATH.toFile();
 
-            CONFIG = configFile.exists() ? GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8), Config.class) : new Config();
+            if (configFile.exists()) {
+                config = GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8), Config.class);
+            } else {
+                config = new Config();
+            }
+
+            CONFIG = config;
             saveConfig();
 
             success = true;
@@ -44,15 +48,25 @@ public class ConfigManager {
         return success;
     }
 
-    public static boolean saveConfig() {
-        boolean success;
+    public void saveConfig() {
         try {
             Files.writeString(CONFIG_PATH, GSON.toJson(CONFIG));
-            success = true;
         } catch (Exception exception) {
-            success = false;
             ShieldStun.LOGGER.error("Error occurred while saving config!", exception);
         }
-        return success;
+    }
+
+    public static ConfigManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ConfigManager();
+        }
+        return INSTANCE;
+    }
+
+    public Config getConfig() {
+        if (CONFIG == null) {
+            return DEFAULT;
+        }
+        return CONFIG;
     }
 }

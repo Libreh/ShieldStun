@@ -21,7 +21,7 @@ public class Commands {
     }
 
     private static int reloadConfig(ServerCommandSource source) {
-        if (ConfigManager.loadConfig()) {
+        if (ConfigManager.getInstance().loadConfig()) {
             source.sendFeedback(() -> Text.literal("Reloaded config!"), false);
         } else {
             source.sendError(Text.literal("Failed to reload the config!").formatted(Formatting.RED));
