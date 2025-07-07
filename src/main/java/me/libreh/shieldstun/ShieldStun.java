@@ -13,7 +13,7 @@ public class ShieldStun implements ModInitializer {
 
     @Override
 	public void onInitialize() {
-		ConfigManager.loadConfig();
+		ConfigManager.getInstance().loadConfig();
 		CommandRegistrationCallback.EVENT.register((dispatcher, access, environment) -> Commands.register(dispatcher));
 	}
 }
