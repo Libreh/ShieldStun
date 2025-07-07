@@ -11,12 +11,19 @@ import net.minecraft.util.Formatting;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class Commands {
+    private static final Text STUNS_ARE = Text.literal("Stuns are ");
+    private static final Text STUNS_HAVE = Text.literal("Stuns have been ");
+    private static final Text ENABLED = Text.literal("enabled").formatted(Formatting.GREEN);
+    private static final Text DISABLED = Text.literal("disabled").formatted(Formatting.RED);
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("shieldstun")
                 .requires(source -> Permissions.check(source, "shieldstun", 3))
                 .then(literal("reload")
                         .requires(source -> Permissions.check(source, "shieldstun.reload", 3))
                         .executes(context -> reloadConfig(context.getSource())))
+                .then(literal("status")
+                        .executes(context -> stunStatus(context.getSource())))
                 .then(literal("enable")
                         .executes(context -> enableStuns(context.getSource())))
                 .then(literal("disable")
@@ -32,19 +39,31 @@ public class Commands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static int stunStatus(ServerCommandSource source) {
+        Text status;
+        if (ConfigManager.getConfig().enableStuns) {
+            status = ENABLED.copy();
+        } else {
+            status = DISABLED.copy();
+        }
+        Text message = STUNS_ARE.copy().append(status);
+        source.sendFeedback(() -> message, false);
+        return Command.SINGLE_SUCCESS;
+    }
+
     private static int enableStuns(ServerCommandSource source) {
         ConfigManager.getConfig().enableStuns = true;
         ConfigManager.saveConfig();
-        source.sendFeedback(() -> Text.literal("Stuns have been ")
-                .append(Text.literal("enabled").formatted(Formatting.GREEN)), false);
+        Text message = STUNS_HAVE.copy().append(ENABLED.copy());
+        source.sendFeedback(() -> message, false);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int disableStuns(ServerCommandSource source) {
         ConfigManager.getConfig().enableStuns = false;
         ConfigManager.saveConfig();
-        source.sendFeedback(() -> Text.literal("Stuns have been ")
-                .append(Text.literal("disabled").formatted(Formatting.RED)), false);
+        Text message = STUNS_HAVE.copy().append(DISABLED.copy());
+        source.sendFeedback(() -> message, false);
         return Command.SINGLE_SUCCESS;
     }
 }
