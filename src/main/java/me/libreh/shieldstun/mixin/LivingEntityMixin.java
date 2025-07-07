@@ -13,6 +13,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -26,9 +27,17 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@WrapOperation(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getDamageBlockedAmount(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)F"))
 	private float shieldStun(LivingEntity instance, ServerWorld world, DamageSource source, float amount, Operation<Float> original, @Cancellable CallbackInfoReturnable<Boolean> cir) {
-		if (this.isBlocking() && source.getSource() != null && source.getSource() instanceof ServerPlayerEntity && ConfigManager.getInstance().getConfig().enableStuns) {
+		if (shouldStun(source)) {
 			cir.setReturnValue(false);
 		}
 		return original.call(instance, world, source, amount);
 	}
+
+	@Unique
+	private boolean shouldStun(DamageSource source) {
+		if (!this.isBlocking()) return false;
+		if (source.getSource() == null) return false;
+		if (!(source.getSource() instanceof ServerPlayerEntity)) return false;
+        return ConfigManager.getConfig().enableStuns;
+    }
 }

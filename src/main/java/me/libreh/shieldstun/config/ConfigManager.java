@@ -13,16 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConfigManager {
-    public static ConfigManager INSTANCE;
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final String CONFIG_NAME = "shieldstun.json";
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(CONFIG_NAME);
+    private static Config CONFIG;
 
-    private ConfigManager() {}
-    
-    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("shieldstun.json");
-    private final Config DEFAULT = new Config();
-    private Config CONFIG;
-
-    public boolean loadConfig() {
+    public static boolean loadConfig() {
         Config oldConfig = CONFIG;
         boolean success;
         CONFIG = null;
@@ -40,32 +36,25 @@ public class ConfigManager {
             saveConfig();
 
             success = true;
-        } catch (Exception exception) {
+        } catch (Exception e) {
             success = false;
             CONFIG = oldConfig;
-            ShieldStun.LOGGER.error("Error while reading config!", exception);
+            ShieldStun.LOGGER.error("Failed to read config " + CONFIG_NAME, e);
         }
         return success;
     }
 
-    public void saveConfig() {
+    public static void saveConfig() {
         try {
             Files.writeString(CONFIG_PATH, GSON.toJson(CONFIG));
         } catch (Exception exception) {
-            ShieldStun.LOGGER.error("Error occurred while saving config!", exception);
+            ShieldStun.LOGGER.error("Failed to save config " + CONFIG_NAME, exception);
         }
     }
 
-    public static ConfigManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ConfigManager();
-        }
-        return INSTANCE;
-    }
-
-    public Config getConfig() {
+    public static Config getConfig() {
         if (CONFIG == null) {
-            return DEFAULT;
+            return new Config();
         }
         return CONFIG;
     }
