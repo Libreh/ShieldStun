@@ -16,8 +16,11 @@ public class Commands {
                 .requires(source -> Permissions.check(source, "shieldstun", 3))
                 .then(literal("reload")
                         .requires(source -> Permissions.check(source, "shieldstun.reload", 3))
-                        .executes(context -> reloadConfig(context.getSource()))
-                        .build()));
+                        .executes(context -> reloadConfig(context.getSource())))
+                .then(literal("enable")
+                        .executes(context -> enableStuns(context.getSource())))
+                .then(literal("disable")
+                        .executes(context -> disableStuns(context.getSource()))));
     }
 
     private static int reloadConfig(ServerCommandSource source) {
@@ -26,6 +29,22 @@ public class Commands {
         } else {
             source.sendError(Text.literal("Failed to reload the config!").formatted(Formatting.RED));
         }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int enableStuns(ServerCommandSource source) {
+        ConfigManager.getInstance().getConfig().enableStuns = true;
+        ConfigManager.getInstance().saveConfig();
+        source.sendFeedback(() -> Text.literal("Stuns have been ")
+                .append(Text.literal("enabled").formatted(Formatting.GREEN)), false);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int disableStuns(ServerCommandSource source) {
+        ConfigManager.getInstance().getConfig().enableStuns = false;
+        ConfigManager.getInstance().saveConfig();
+        source.sendFeedback(() -> Text.literal("Stuns have been ")
+                .append(Text.literal("disabled").formatted(Formatting.RED)), false);
         return Command.SINGLE_SUCCESS;
     }
 }
