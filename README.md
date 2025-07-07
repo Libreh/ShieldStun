@@ -15,9 +15,8 @@ The config file is located at `config/shieldstun.json`.
 
 ## Commands and permissions
 
-| Command                                 | Permission               | Description        |
-|-----------------------------------------|--------------------------|--------------------|
-| /shieldstun reload                      | shieldstun.reload (op 3) | Reloads the config |
-| /shieldstun config show                 | shieldstun.main (op 3)   | Shows the config   |
-| /shieldstun config get <option>         | shieldstun.main (op 3)   | Gets option value  |
-| /shieldstun config set <option> <value> | shieldstun.main (op 3)   | Sets option value  |
+| Command                                 | Permission                  | Description        |
+|-----------------------------------------|-----------------------------|--------------------|
+| /shieldstun reload                      | shieldstun.reload (or op 3) | Reloads the config |
+| /shieldstun enable                      | shieldstun (or op 3)        | Enable the mod     |
+| /shieldstun disable                     | shieldstun (or op 3)        | Disable the mod    |
