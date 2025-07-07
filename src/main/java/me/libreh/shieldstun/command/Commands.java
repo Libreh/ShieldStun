@@ -24,25 +24,25 @@ public class Commands {
     }
 
     private static int reloadConfig(ServerCommandSource source) {
-        if (ConfigManager.getInstance().loadConfig()) {
+        if (ConfigManager.loadConfig()) {
             source.sendFeedback(() -> Text.literal("Reloaded config!"), false);
         } else {
-            source.sendError(Text.literal("Failed to reload the config!").formatted(Formatting.RED));
+            source.sendError(Text.literal("Failed to reload the config! Check server console for more info.").formatted(Formatting.RED));
         }
         return Command.SINGLE_SUCCESS;
     }
 
     private static int enableStuns(ServerCommandSource source) {
-        ConfigManager.getInstance().getConfig().enableStuns = true;
-        ConfigManager.getInstance().saveConfig();
+        ConfigManager.getConfig().enableStuns = true;
+        ConfigManager.saveConfig();
         source.sendFeedback(() -> Text.literal("Stuns have been ")
                 .append(Text.literal("enabled").formatted(Formatting.GREEN)), false);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int disableStuns(ServerCommandSource source) {
-        ConfigManager.getInstance().getConfig().enableStuns = false;
-        ConfigManager.getInstance().saveConfig();
+        ConfigManager.getConfig().enableStuns = false;
+        ConfigManager.saveConfig();
         source.sendFeedback(() -> Text.literal("Stuns have been ")
                 .append(Text.literal("disabled").formatted(Formatting.RED)), false);
         return Command.SINGLE_SUCCESS;
