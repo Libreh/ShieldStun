@@ -18,15 +18,17 @@ public class Commands {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("shieldstun")
-                .requires(source -> Permissions.check(source, "shieldstun", 3))
                 .then(literal("reload")
                         .requires(source -> Permissions.check(source, "shieldstun.reload", 3))
                         .executes(context -> reloadConfig(context.getSource())))
                 .then(literal("status")
+                        .requires(source -> Permissions.check(source, "shieldstun.status", true))
                         .executes(context -> stunStatus(context.getSource())))
                 .then(literal("enable")
+                        .requires(source -> Permissions.check(source, "shieldstun.enable", 3))
                         .executes(context -> enableStuns(context.getSource())))
                 .then(literal("disable")
+                        .requires(source -> Permissions.check(source, "shieldstun.disable", 3))
                         .executes(context -> disableStuns(context.getSource()))));
     }
 
