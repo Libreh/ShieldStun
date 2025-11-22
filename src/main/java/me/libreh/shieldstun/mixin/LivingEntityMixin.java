@@ -36,7 +36,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@WrapOperation(method = "getDamageBlockedAmount", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;takeShieldHit(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/LivingEntity;)V"))
 	private void getDamageBlockedAmount(LivingEntity instance, ServerWorld world, LivingEntity attacker, Operation<Void> original) {
-		if (isFacingAttacker(attacker.getPos())) {
+		if (isFacingAttacker(attacker.getEntityPos())) {
 			original.call(instance, world, attacker);
 		}
 	}
@@ -53,7 +53,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique
 	private boolean isFacingAttacker(Vec3d attackPos) {
 		Vec3d facing = this.getRotationVector(0.0F, this.getHeadYaw());
-		Vec3d toAttack = attackPos.subtract(this.getPos()).multiply(1, 0, 1).normalize();
+		Vec3d toAttack = attackPos.subtract(this.getEntityPos()).multiply(1, 0, 1).normalize();
 		double angle = Math.acos(toAttack.dotProduct(facing));
 		return angle < (Math.PI / 2);
 	}
