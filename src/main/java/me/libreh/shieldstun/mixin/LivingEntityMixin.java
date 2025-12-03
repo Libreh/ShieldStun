@@ -1,40 +1,37 @@
 package me.libreh.shieldstun.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Cancellable;
-import me.libreh.shieldstun.config.ConfigManager;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity {
-	@Shadow public abstract boolean isBlocking();
+public class LivingEntityMixin {
+    @Inject(
+            method = "getKnockbackAgainst",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void modifyKnockback(Entity entity, DamageSource damageSource, CallbackInfoReturnable<Float> cir) {
+        if (entity instanceof LivingEntity target && target.timeUntilRegen < 20) {
+            cir.setReturnValue(0.0F);
+            return;
+        }
 
-	public LivingEntityMixin(EntityType<?> type, World world) {
-		super(type, world);
-	}
-
-	@WrapOperation(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;takeShieldHit(Lnet/minecraft/entity/LivingEntity;)V"))
-	private void shieldStun(LivingEntity instance, LivingEntity attacker, Operation<Void> original, @Cancellable CallbackInfoReturnable<Boolean> cir) {
-		if (shouldStun(attacker)) {
-			cir.setReturnValue(false);
-		}
-		original.call(instance, attacker);
-	}
-
-	@Unique
-	private boolean shouldStun(LivingEntity attacker) {
-		if (!(attacker instanceof ServerPlayerEntity)) return false;
-		if (!this.isBlocking()) return false;
-        return ConfigManager.getConfig().enableStuns;
+        float baseKnockback = (float) ((LivingEntity) (Object) this).getAttributeValue(EntityAttributes.GENERIC_ATTACK_KNOCKBACK);
+        World world = ((LivingEntity) (Object) this).getEntityWorld();
+        if (world instanceof ServerWorld serverWorld) {
+            float modifiedKnockback = EnchantmentHelper.modifyKnockback(serverWorld, ((LivingEntity) (Object) this).getMainHandStack(), entity, damageSource, baseKnockback);
+            cir.setReturnValue(modifiedKnockback);
+        } else {
+            cir.setReturnValue(baseKnockback);
+        }
     }
 }
