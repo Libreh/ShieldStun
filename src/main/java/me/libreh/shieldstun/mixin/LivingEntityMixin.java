@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * From: TheobladTheBird/CarpetPvP @ 1.21.5 (LivingEntity_getKBFix.java)
+ * From: TheobaldTheBird/CarpetPvP @ 1.21.5 (LivingEntity_getKBFix.java)
  */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
