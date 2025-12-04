@@ -30,5 +30,5 @@ If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [Carpet
 
 `/carpet shieldStunning true`
 
-This will TEMPORARILY enable shieldStunning for fake players,
-if you want it to be PERMANENT, click the text that says '[Change permanently?]'.
+This will TEMPORARILY enable shieldStunning for fake players.
+If you want it to be PERMANENT, click the text that says '[Change permanently?]'.
