@@ -4,6 +4,9 @@ A server-side Fabric mod that fixes an 8 year old Minecraft bug ([MC-268147](htt
 This is done by porting Paper's `skip-vanilla-damage-tick-when-shield-blocked` setting to Fabric.
 The patch is from [`LivingEntity.java`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241).
 
+
+The current Fabric code is from [TheobaldTheBird/CarpetPvP](https://github.com/TheobaldTheBird/CarpetPVP)'s shieldStunning setting.
+
 ## Configuration
 
 The config file is located at `config/shieldstun.json`.
