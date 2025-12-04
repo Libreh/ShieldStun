@@ -20,7 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * From: TheobladTheBird/CarpetPvP @ 1.21.5 (Player_shieldStunMixin.java)
+ * From: TheobaldTheBird/CarpetPvP @ 1.21.5 (Player_shieldStunMixin.java)
  */
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
