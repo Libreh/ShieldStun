@@ -5,6 +5,7 @@ This is done by porting Paper's `skip-vanilla-damage-tick-when-shield-blocked` s
 The patch is from [`LivingEntity.java`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241).
 
 ## Configuration
+
 The config file is located at `config/shieldstun.json`.
 ```json5
 {
@@ -21,3 +22,13 @@ The config file is located at `config/shieldstun.json`.
 | /shieldstun status  | shieldstun.status           | Get stun status    |
 | /shieldstun enable  | shieldstun.enable (or op 3) | Enable the mod     |
 | /shieldstun disable | shieldstun.status (or op 3) | Disable the mod    |
+
+## What this mod doesn't do
+
+This mod does not enable shield stunning for fake players like those found in [Carpet](https://github.com/gnembon/fabric-carpet).
+If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [CarpetPvP](https://github.com/TheobaldTheBird/CarpetPVP) mod, type:
+
+`/carpet shieldStunning true`
+
+This will TEMPORARILY enable shieldStunning for fake players,
+if you want it to be PERMANENT, click the text that says '[Change permanently?]'.
