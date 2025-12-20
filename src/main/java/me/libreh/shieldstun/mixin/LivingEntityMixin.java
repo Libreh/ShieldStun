@@ -1,12 +1,12 @@
 package me.libreh.shieldstun.mixin;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,20 +19,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class LivingEntityMixin {
 
     @Inject(
-            method = "getAttackKnockbackAgainst",
+            method = "getKnockback",
             at = @At("HEAD"),
             cancellable = true
     )
     private void modifyKnockback(Entity entity, DamageSource damageSource, CallbackInfoReturnable<Float> cir) {
-        if (entity instanceof LivingEntity target && target.timeUntilRegen < 20) {
+        if (entity instanceof LivingEntity target && target.invulnerableTime < 20) {
             cir.setReturnValue(0.0F);
             return;
         }
 
-        float baseKnockback = (float) ((LivingEntity) (Object) this).getAttributeValue(EntityAttributes.ATTACK_KNOCKBACK);
-        World world = ((LivingEntity) (Object) this).getEntityWorld();
-        if (world instanceof ServerWorld serverWorld) {
-            float modifiedKnockback = EnchantmentHelper.modifyKnockback(serverWorld, ((LivingEntity) (Object) this).getMainHandStack(), entity, damageSource, baseKnockback);
+        float baseKnockback = (float) ((LivingEntity) (Object) this).getAttributeValue(Attributes.ATTACK_KNOCKBACK);
+        Level level = ((LivingEntity) (Object) this).level();
+        if (level instanceof ServerLevel serverLevel) {
+            float modifiedKnockback = EnchantmentHelper.modifyKnockback(serverLevel, ((LivingEntity) (Object) this).getMainHandItem(), entity, damageSource, baseKnockback);
             cir.setReturnValue(modifiedKnockback);
         } else {
             cir.setReturnValue(baseKnockback);

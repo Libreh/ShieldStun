@@ -1,14 +1,14 @@
 package me.libreh.shieldstun.mixin;
 
 import me.libreh.shieldstun.config.ConfigManager;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BlocksAttacksComponent;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.BlocksAttacks;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,30 +22,30 @@ import java.util.concurrent.TimeUnit;
 /**
  * From: TheobaldTheBird/CarpetPvP @ 1.21.5 (Player_shieldStunMixin.java)
  */
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
     @Unique
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
-        super(entityType, world);
+    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, Level level) {
+        super(entityType, level);
     }
 
-    @Inject(method = "takeShieldHit", at = @At("HEAD"))
-    private void onShieldDisabled(ServerWorld serserverWorlderLevel, LivingEntity livingEntity, CallbackInfo ci) {
+    @Inject(method = "blockUsingItem", at = @At("HEAD"))
+    private void onShieldDisabled(ServerLevel serverLevel, LivingEntity livingEntity, CallbackInfo ci) {
         var canDisableShield = false;
         // same code as from blockUsingItem in LivingEntity where it checks if you can disable shield
-        ItemStack itemStack = this.getBlockingItem();
-        BlocksAttacksComponent blocksAttacks = itemStack != null ? (BlocksAttacksComponent)itemStack.get(DataComponentTypes.BLOCKS_ATTACKS) : null;
-        float f = livingEntity.getWeaponDisableBlockingForSeconds();
+        ItemStack itemStack = this.getItemBlockingWith();
+        BlocksAttacks blocksAttacks = itemStack != null ? (BlocksAttacks) itemStack.get(DataComponents.BLOCKS_ATTACKS) : null;
+        float f = livingEntity.getSecondsToDisableBlocking();
         if (f > 0.0F && blocksAttacks != null) {
             canDisableShield = true;
         }
 
         if (canDisableShield && ConfigManager.getConfig().enableStuns) {
-            this.timeUntilRegen = 20;
+            this.invulnerableTime = 20;
             executor.schedule(() -> {
-                this.timeUntilRegen = 0;
+                this.invulnerableTime = 0;
             }, 1, TimeUnit.MILLISECONDS);
         }
     }
