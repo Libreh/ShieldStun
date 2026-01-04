@@ -1,11 +1,8 @@
 # Shield Stun (Fabric)
 
-A server-side Fabric mod that fixes an 8 year old Minecraft bug ([MC-268147](https://bugs.mojang.com/browse/MC-268147)) from 1.11.2.
-This is done by porting Paper's `skip-vanilla-damage-tick-when-shield-blocked` setting to Fabric.
-The patch is from [`LivingEntity.java`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241).
+Server-side Fabric mod that fixes an 8-year-old Minecraft Fixes shield invulnerability tick bug MC-268147 bug ([MC-268147](https://bugs.mojang.com/browse/MC-268147)) from 1.11.2.
 
-
-The current Fabric code is from [TheobaldTheBird/CarpetPvP](https://github.com/TheobaldTheBird/CarpetPVP)'s shieldStunning setting.
+This is done by porting Paper's [`skip-vanilla-damage-tick-when-shield-blocked`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241) setting to Fabric.
 
 ## Configuration
 

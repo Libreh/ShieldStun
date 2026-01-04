@@ -3,10 +3,14 @@
 	"id": "shieldstun",
 	"version": "${version}",
 	"name": "Shield Stun",
-	"description": "A server-side Fabric mod that fixes Minecraft bug MC-268147",
+	"description": "Fixes shield invulnerability tick bug MC-268147",
 	"authors": [
 		"Libreh"
 	],
+    "contact": {
+      "homepage": "https://github.com/Libreh",
+      "sources": "https://github.com/Libreh/ShieldStun"
+    },
 	"license": "LGPLv3",
 	"icon": "assets/shieldstun/icon.png",
 	"environment": "*",
