@@ -1,41 +1,35 @@
 package me.libreh.shieldstun.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Cancellable;
+import me.libreh.shieldstun.config.ConfigManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * From: TheobaldTheBird/CarpetPvP @ 1.21.5 (LivingEntity_getKBFix.java)
- */
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin {
+public abstract class LivingEntityMixin extends Entity {
+    @Shadow
+    public abstract float getYHeadRot();
 
-    @Inject(
-            method = "getKnockback",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void modifyKnockback(Entity entity, DamageSource damageSource, CallbackInfoReturnable<Float> cir) {
-        if (entity instanceof LivingEntity target && target.invulnerableTime < 20) {
-            cir.setReturnValue(0.0F);
-            return;
-        }
+    public LivingEntityMixin(EntityType<?> type, Level level) {
+        super(type, level);
+    }
 
-        float baseKnockback = (float) ((LivingEntity) (Object) this).getAttributeValue(Attributes.ATTACK_KNOCKBACK);
-        Level level = ((LivingEntity) (Object) this).level();
-        if (level instanceof ServerLevel serverLevel) {
-            float modifiedKnockback = EnchantmentHelper.modifyKnockback(serverLevel, ((LivingEntity) (Object) this).getMainHandItem(), entity, damageSource, baseKnockback);
-            cir.setReturnValue(modifiedKnockback);
-        } else {
-            cir.setReturnValue(baseKnockback);
+    @WrapOperation(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;applyItemBlocking(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)F"))
+    private float hurtServer(LivingEntity instance, ServerLevel world, DamageSource source, float amount, Operation<Float> original, @Cancellable CallbackInfoReturnable<Boolean> cir) {
+        float blockedDamage = original.call(instance, world, source, amount);
+        if (blockedDamage != 0.0F && ConfigManager.getConfig().enableStuns) {
+            cir.setReturnValue(false);
         }
+        return blockedDamage;
     }
 }
