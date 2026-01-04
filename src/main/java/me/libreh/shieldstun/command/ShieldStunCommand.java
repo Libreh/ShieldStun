@@ -34,7 +34,7 @@ public class Commands {
     }
 
     private static int reloadConfig(CommandSourceStack source) {
-        if (ConfigManager.loadConfig()) {
+        if (ConfigManager.load()) {
             source.sendSuccess(() -> Component.literal("Reloaded config!"), false);
         } else {
             source.sendFailure(Component.literal("Failed to reload the config! Check server console for more info.").withStyle(ChatFormatting.RED));
@@ -56,7 +56,7 @@ public class Commands {
 
     private static int enableStuns(CommandSourceStack source) {
         ConfigManager.getConfig().enableStuns = true;
-        ConfigManager.saveConfig();
+        ConfigManager.save();
         Component message = STUNS_HAVE.copy().append(ENABLED.copy());
         source.sendSuccess(() -> message, false);
         return Command.SINGLE_SUCCESS;
@@ -64,7 +64,7 @@ public class Commands {
 
     private static int disableStuns(CommandSourceStack source) {
         ConfigManager.getConfig().enableStuns = false;
-        ConfigManager.saveConfig();
+        ConfigManager.save();
         Component message = STUNS_HAVE.copy().append(DISABLED.copy());
         source.sendSuccess(() -> message, false);
         return Command.SINGLE_SUCCESS;
