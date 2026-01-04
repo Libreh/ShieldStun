@@ -1,6 +1,6 @@
 # Shield Stun (Fabric)
 
-Server-side Fabric mod that fixes 8-year-old Minecraft shield invulnerability tick bug MC-268147 ([MC-268147](https://bugs.mojang.com/browse/MC-268147)) from 1.11.2.
+Server-side Fabric mod that fixes 8-year-old Minecraft shield invulnerability tick bug [MC-268147](https://bugs.mojang.com/browse/MC-268147) from 1.11.2.
 
 This is done by porting Paper's [`skip-vanilla-damage-tick-when-shield-blocked`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241) setting to Fabric.
 
