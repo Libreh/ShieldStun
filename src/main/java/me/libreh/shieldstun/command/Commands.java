@@ -7,6 +7,7 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionLevel;
 
 import static net.minecraft.commands.Commands.literal;
 
@@ -19,16 +20,16 @@ public class Commands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("shieldstun")
                 .then(literal("reload")
-                        .requires(source -> Permissions.check(source, "shieldstun.reload", 3))
+                        .requires(source -> Permissions.check(source, "shieldstun.reload", PermissionLevel.ADMINS))
                         .executes(context -> reloadConfig(context.getSource())))
                 .then(literal("status")
                         .requires(source -> Permissions.check(source, "shieldstun.status", true))
                         .executes(context -> stunStatus(context.getSource())))
                 .then(literal("enable")
-                        .requires(source -> Permissions.check(source, "shieldstun.enable", 3))
+                        .requires(source -> Permissions.check(source, "shieldstun.enable", PermissionLevel.ADMINS))
                         .executes(context -> enableStuns(context.getSource())))
                 .then(literal("disable")
-                        .requires(source -> Permissions.check(source, "shieldstun.disable", 3))
+                        .requires(source -> Permissions.check(source, "shieldstun.disable", PermissionLevel.ADMINS))
                         .executes(context -> disableStuns(context.getSource()))));
     }
 
