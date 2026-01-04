@@ -2,16 +2,19 @@ package me.libreh.shieldstun.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
 import me.libreh.shieldstun.config.ConfigManager;
+import me.libreh.shieldstun.util.GenericModInfo;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.PermissionLevel;
 
 import static net.minecraft.commands.Commands.literal;
 
-public class Commands {
+public class ShieldStunCommand {
     private static final Component STUNS_ARE = Component.literal("Stuns are ");
     private static final Component STUNS_HAVE = Component.literal("Stuns have been ");
     private static final Component ENABLED = Component.literal("enabled").withStyle(ChatFormatting.GREEN);
@@ -19,6 +22,7 @@ public class Commands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("shieldstun")
+                .executes(ShieldStunCommand::about)
                 .then(literal("reload")
                         .requires(source -> Permissions.check(source, "shieldstun.reload", PermissionLevel.ADMINS))
                         .executes(context -> reloadConfig(context.getSource())))
@@ -31,6 +35,16 @@ public class Commands {
                 .then(literal("disable")
                         .requires(source -> Permissions.check(source, "shieldstun.disable", PermissionLevel.ADMINS))
                         .executes(context -> disableStuns(context.getSource()))));
+    }
+
+    private static int about(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+
+        for (var text : source.getEntity() instanceof ServerPlayer ? GenericModInfo.getAboutFull() : GenericModInfo.getAboutConsole()) {
+            source.sendSuccess(() -> text, false);
+        }
+
+        return 1;
     }
 
     private static int reloadConfig(CommandSourceStack source) {

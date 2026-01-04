@@ -16,5 +16,6 @@ public class ShieldStun implements ModInitializer {
 		ConfigManager.loadConfig();
 		CommandRegistrationCallback.EVENT.register((dispatcher, access, environment) -> Commands.register(dispatcher));
 		ConfigManager.load();
+		CommandRegistrationCallback.EVENT.register((dispatcher, access, environment) -> ShieldStunCommand.register(dispatcher));
 	}
 }
