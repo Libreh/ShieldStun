@@ -1,6 +1,6 @@
 # Shield Stun (Fabric)
 
-Server-side Fabric mod that fixes an 8-year-old Minecraft Fixes shield invulnerability tick bug MC-268147 bug ([MC-268147](https://bugs.mojang.com/browse/MC-268147)) from 1.11.2.
+Server-side Fabric mod that fixes 8-year-old Minecraft shield invulnerability tick bug [MC-268147](https://bugs.mojang.com/browse/MC-268147) from 1.11.2.
 
 This is done by porting Paper's [`skip-vanilla-damage-tick-when-shield-blocked`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241) setting to Fabric.
 
@@ -18,6 +18,7 @@ The config file is located at `config/shieldstun.json`.
 
 | Command             | Permission                  | Description        |
 |---------------------|-----------------------------|--------------------|
+| /shieldstun         | everyone                    | About info         |
 | /shieldstun reload  | shieldstun.reload (or op 3) | Reloads the config |
 | /shieldstun status  | shieldstun.status           | Get stun status    |
 | /shieldstun enable  | shieldstun.enable (or op 3) | Enable the mod     |
@@ -30,5 +31,5 @@ If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [Carpet
 
 `/carpet shieldStunning true`
 
-This will TEMPORARILY enable shieldStunning for fake players.
-If you want it to be PERMANENT, click the text that says '[Change permanently?]'.
+This will **temporarily** enable shieldStunning for fake players.
+If you want it to be **permanent**, click the text that says '[Change permanently?]'.
