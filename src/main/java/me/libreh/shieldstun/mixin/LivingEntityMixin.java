@@ -26,7 +26,7 @@ public abstract class LivingEntityMixin extends Entity {
     @WrapOperation(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;applyItemBlocking(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)F"))
     private float hurtServer(LivingEntity instance, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, Operation<Float> original) {
         float blockedAmount = original.call(instance, serverLevel, damageSource, damageAmount);
-        blockedHit = ConfigManager.getConfig().enableStuns && damageAmount != 0.0F;
+        blockedHit = ConfigManager.getConfig().enableStuns && blockedAmount != 0.0F;
         return blockedAmount;
     }
 
