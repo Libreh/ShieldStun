@@ -6,8 +6,9 @@ import com.google.gson.JsonSyntaxException;
 import me.libreh.shieldstun.ShieldStun;
 import net.fabricmc.loader.api.FabricLoader;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
