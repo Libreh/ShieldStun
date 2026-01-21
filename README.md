@@ -35,3 +35,5 @@ If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [Carpet
 
 This will TEMPORARILY enable shieldStunning for fake players.
 If you want it to be PERMANENT, click the text that says '[Change permanently?]'.
+
+This mod also doesn't enable stunning on Paper servers that don't have `skip-vanilla-damage-tick-when-shield-blocked` set to `true`.
