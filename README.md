@@ -25,7 +25,9 @@ The config file is located at `config/shieldstun.json`.
 | /shieldstun disable | shieldstun.status (or op 3) | Disable the mod    |
 
 ## What this mod doesn't do
-
+[libreh-cutoff-ogmoe_04-raw.mkv](../../../../Videos/raw/libreh-cutoff-ogmoe_04-raw.mkv)
+[libreh-cutoff-ogmoe_05-raw.mkv](../../../../Videos/raw/libreh-cutoff-ogmoe_05-raw.mkv)
+[libreh-cutoff-ogmoe_06-raw.mkv](../../../../Videos/raw/libreh-cutoff-ogmoe_06-raw.mkv)
 This mod does not enable shield stunning for fake players like those found in [Carpet](https://github.com/gnembon/fabric-carpet).
 If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [CarpetPvP](https://github.com/TheobaldTheBird/CarpetPVP) mod, type:
 
@@ -34,4 +36,4 @@ If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [Carpet
 This will **temporarily** enable shieldStunning for fake players.
 If you want it to be **permanent**, click the text that says '[Change permanently?]'.
 
-This mod also doesn't enable stunning on Paper servers that don't have `skip-vanilla-damage-tick-when-shield-blocked` set to `true`.
+This mod also doesn't enable stunning on Paper servers that have shield stunning disabled.
