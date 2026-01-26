@@ -7,6 +7,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.ChatFormatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ public class ShieldStun implements ModInitializer {
 
     @Override
 	public void onInitialize() {
-        GenericModInfo.build(CONTAINER, MOD_ID, LOGGER, true, true, 0xFF80EA);
+        GenericModInfo.build(CONTAINER, MOD_ID, LOGGER, true, true, ChatFormatting.RED.getColor());
 
 		ConfigManager.load();
 		CommandRegistrationCallback.EVENT.register((dispatcher, access, environment) -> ShieldStunCommand.register(dispatcher));
