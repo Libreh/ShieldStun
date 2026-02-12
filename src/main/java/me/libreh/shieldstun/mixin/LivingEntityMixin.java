@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.libreh.shieldstun.config.ConfigManager;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -23,15 +22,18 @@ public abstract class LivingEntityMixin extends Entity {
     @Unique
     private boolean blockedHit = false;
 
-    @WrapOperation(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;applyItemBlocking(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)F"))
-    private float hurtServer(LivingEntity instance, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, Operation<Float> original) {
-        float blockedAmount = original.call(instance, serverLevel, damageSource, damageAmount);
-        blockedHit = ConfigManager.getConfig().enableStuns && blockedAmount != 0.0F;
-        return blockedAmount;
+    @WrapOperation(
+            method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z")
+    )
+    private boolean hurt(LivingEntity instance, DamageSource damageSource, Operation<Boolean> original) {
+        boolean blocked = original.call(instance, damageSource);
+        blockedHit = ConfigManager.getConfig().enableStuns && blocked;
+        return blocked;
     }
 
-    @ModifyReturnValue(method = "hurtServer", at = @At("RETURN"))
-    private boolean hurtServerReturn(boolean original) {
+    @ModifyReturnValue(method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", at = @At("RETURN"))
+    private boolean hurtReturn(boolean original) {
         if (blockedHit) {
             this.invulnerableTime = 0;
             return false;

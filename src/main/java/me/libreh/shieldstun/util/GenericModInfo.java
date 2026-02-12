@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,14 +65,14 @@ public class GenericModInfo {
                         runLength++;
                     } else {
                         line.append(Component.literal("█".repeat(runLength))
-                                .setStyle(Style.EMPTY.withColor(currentColor).withShadowColor(currentColor | 0xFF000000)));
+                                .setStyle(Style.EMPTY.withColor(currentColor)));
                         currentColor = pixelColor;
                         runLength = 1;
                     }
                 }
 
                 line.append(Component.literal("█".repeat(runLength))
-                        .setStyle(Style.EMPTY.withColor(currentColor).withShadowColor(currentColor | 0xFF000000)));
+                        .setStyle(Style.EMPTY.withColor(currentColor)));
                 iconLines.add(line);
             }
         } catch (Throwable e) {
@@ -99,27 +98,27 @@ public class GenericModInfo {
 
             var title = Component.literal(metadata.getName())
                     .setStyle(Style.EMPTY.withColor(titleColor).withBold(true)
-                            .withClickEvent(new ClickEvent.OpenUrl(URI.create(sources))));
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, sources)));
 
             var versionUrl = hasSourcesUrl ? sources + "/releases/tag/" + versionString : sources;
             var version = Component.literal("Version: ").setStyle(Style.EMPTY.withColor(VERSION_LABEL_COLOR))
                     .append(Component.literal(versionString)
                             .setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE)
-                                    .withClickEvent(new ClickEvent.OpenUrl(URI.create(versionUrl)))));
+                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, versionUrl))));
 
             var links = Component.literal("");
             if (showModrinth) {
                 var modrinthUrl = "https://modrinth.com/mod/" + id + "/version/" + versionString;
                 var modrinth = Component.literal("Modrinth")
                         .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent.OpenUrl(URI.create(modrinthUrl))));
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, modrinthUrl)));
                 links.append(modrinth);
             }
 
             if (showGitHub) {
                 var github = Component.literal("GitHub")
                         .setStyle(Style.EMPTY.withColor(GITHUB_LINK_COLOR)
-                                .withClickEvent(new ClickEvent.OpenUrl(URI.create(sources))));
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, sources)));
                 if (showModrinth) {
                     links.append(Component.literal(" • ").setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
                 }
@@ -144,14 +143,14 @@ public class GenericModInfo {
             var contributorsUrl = hasSourcesUrl ? sources + "/contributors" : sources;
             fullAbout.add(Component.literal("Contributors")
                     .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)
-                            .withHoverEvent(new HoverEvent.ShowText(Component.literal(String.join(", ", contributors))))
-                            .withClickEvent(new ClickEvent.OpenUrl(URI.create(contributorsUrl)))));
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(String.join(", ", contributors))))
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, contributorsUrl))));
             fullAbout.add(Component.empty());
 
             var words = new ArrayList<>(List.of(metadata.getDescription().split(" ")));
             var line = new StringBuilder();
             while (!words.isEmpty()) {
-                (line.isEmpty() ? line : line.append(" ")).append(words.removeFirst());
+                (line.isEmpty() ? line : line.append(" ")).append(words.remove(0));
                 if (line.length() > 16) {
                     fullAbout.add(Component.literal(line.toString()).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
                     line = new StringBuilder();
