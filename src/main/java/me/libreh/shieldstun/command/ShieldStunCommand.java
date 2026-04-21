@@ -9,11 +9,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.permissions.PermissionLevel;
 
 import static net.minecraft.commands.Commands.literal;
 
 public class ShieldStunCommand {
+    private static final int ADMIN_PERMISSION_LEVEL = 3;
     private static final Component STUNS_ARE = Component.literal("Stuns are ");
     private static final Component STUNS_HAVE = Component.literal("Stuns have been ");
     private static final Component ENABLED = Component.literal("enabled").withStyle(ChatFormatting.GREEN);
@@ -23,16 +23,16 @@ public class ShieldStunCommand {
         dispatcher.register(literal("shieldstun")
                 .executes(ShieldStunCommand::about)
                 .then(literal("reload")
-                        .requires(source -> Permissions.check(source, "shieldstun.reload", PermissionLevel.ADMINS))
+                        .requires(source -> Permissions.check(source, "shieldstun.reload", ADMIN_PERMISSION_LEVEL))
                         .executes(context -> reloadConfig(context.getSource())))
                 .then(literal("status")
                         .requires(source -> Permissions.check(source, "shieldstun.status", true))
                         .executes(context -> stunStatus(context.getSource())))
                 .then(literal("enable")
-                        .requires(source -> Permissions.check(source, "shieldstun.enable", PermissionLevel.ADMINS))
+                        .requires(source -> Permissions.check(source, "shieldstun.enable", ADMIN_PERMISSION_LEVEL))
                         .executes(context -> enableStuns(context.getSource())))
                 .then(literal("disable")
-                        .requires(source -> Permissions.check(source, "shieldstun.disable", PermissionLevel.ADMINS))
+                        .requires(source -> Permissions.check(source, "shieldstun.disable", ADMIN_PERMISSION_LEVEL))
                         .executes(context -> disableStuns(context.getSource()))));
     }
 

@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
     id "com.modrinth.minotaur" version "2.+"
 }
@@ -9,24 +9,17 @@ version = project.mod_version + "+" + project.minecraft_version
 group = project.maven_group
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
     mavenCentral()
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    // Mod libraries
-	implementation include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
+	modImplementation include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
 }
 
 processResources {
@@ -38,12 +31,12 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = 17
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
@@ -57,10 +50,10 @@ var isStable = project.is_stable == "true"
 if (System.getenv("MODRINTH")) {
     modrinth {
         token = System.getenv("MODRINTH")
-        projectId = 'xZK7iTeY'// The ID of your modrinth project, slugs will not work.
-        versionNumber = "" + version // The version of the mod to upload.
+        projectId = 'xZK7iTeY'
+        versionNumber = "" + version
         versionType = isStable ? "release" : "beta"
-        uploadFile = remapJar // This links to a task that builds your mod jar and sets "uploadFile" to the mod jar.
+        uploadFile = remapJar
         gameVersions = [((String) project.minecraft_version)]
         changelog = System.getenv("CHANGELOG")
         loaders = ["fabric", "quilt"]
