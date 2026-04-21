@@ -4,11 +4,11 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import me.libreh.shieldstun.config.ConfigManager;
-import me.libreh.shieldstun.util.GenericModInfo;
+import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 
 import static net.minecraft.commands.Commands.literal;
 
@@ -23,27 +23,24 @@ public class ShieldStunCommand {
         dispatcher.register(literal("shieldstun")
                 .executes(ShieldStunCommand::about)
                 .then(literal("reload")
-                        .requires(source -> source.hasPermission(ADMIN_PERMISSION_LEVEL))
+                        .requires(source -> Permissions.check(source, "shieldstun.reload", ADMIN_PERMISSION_LEVEL))
                         .executes(context -> reloadConfig(context.getSource())))
                 .then(literal("status")
-                        .requires(source -> source.hasPermission(0))
+                        .requires(source -> Permissions.check(source, "shieldstun.status", true))
                         .executes(context -> stunStatus(context.getSource())))
                 .then(literal("enable")
-                        .requires(source -> source.hasPermission(ADMIN_PERMISSION_LEVEL))
+                        .requires(source -> Permissions.check(source, "shieldstun.enable", ADMIN_PERMISSION_LEVEL))
                         .executes(context -> enableStuns(context.getSource())))
                 .then(literal("disable")
-                        .requires(source -> source.hasPermission(ADMIN_PERMISSION_LEVEL))
+                        .requires(source -> Permissions.check(source, "shieldstun.disable", ADMIN_PERMISSION_LEVEL))
                         .executes(context -> disableStuns(context.getSource()))));
     }
 
     private static int about(CommandContext<CommandSourceStack> context) {
-        CommandSourceStack source = context.getSource();
-
-        for (var text : source.getEntity() instanceof ServerPlayer ? GenericModInfo.getAboutFull() : GenericModInfo.getAboutConsole()) {
-            source.sendSuccess(text, false);
-        }
-
-        return 1;
+        var meta = FabricLoader.getInstance().getModContainer("shieldstun").orElseThrow().getMetadata();
+        Component message = Component.literal(meta.getName() + " v" + meta.getVersion().getFriendlyString());
+        context.getSource().sendSuccess(message, false);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int reloadConfig(CommandSourceStack source) {
