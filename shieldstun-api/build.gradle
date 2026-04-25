@@ -1,0 +1,36 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+}
+
+base.archivesName = "shieldstun-api"
+version = project.mod_version + "+" + project.minecraft_version
+group = project.maven_group
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.nucleoid.xyz' }
+    maven { url 'https://maven.supersanta.me/snapshots' }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    compileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") { expand "version": inputs.properties.version }
+}
+
+tasks.withType(JavaCompile).configureEach { it.options.release = 21 }
+java { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21 }
+
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = "shieldstun-api"
+            from components.java
+        }
+    }
+}
