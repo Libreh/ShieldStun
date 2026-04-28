@@ -16,7 +16,9 @@ dependencies {
     api project(path: ":shieldstun-api")
     include project(path: ":shieldstun-api")
 
-    modImplementation include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
+    modImplementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")) {
+        exclude group: "net.fabricmc.fabric-api"
+    }
 }
 
 var isStable = project.is_stable == "true"
