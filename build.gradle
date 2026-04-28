@@ -19,8 +19,8 @@ subprojects {
         mappings loom.officialMojangMappings()
         modCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
         modLocalRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
-        modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-        modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+        modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     }
 
     processResources {
