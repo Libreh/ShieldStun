@@ -1,0 +1,10 @@
+base.archivesName = "shieldstun-api"
+
+loom {
+    runConfigs.clear()
+    mods {
+        "shieldstun-api" {
+            sourceSet sourceSets.main
+        }
+    }
+}

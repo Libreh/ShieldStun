@@ -1,65 +1,57 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
-	id 'maven-publish'
-    id "com.modrinth.minotaur" version "2.+"
+    id 'fabric-loom' version "${loom_version}" apply false
+    id 'maven-publish'
 }
 
-base.archivesName = project.archives_base_name
-version = project.mod_version + "+" + project.minecraft_version
-group = project.maven_group
+subprojects {
+    apply plugin: 'fabric-loom'
+    apply plugin: 'maven-publish'
 
-repositories {
-    mavenCentral()
-}
+    version = project.mod_version + "+" + project.minecraft_version
+    group = project.maven_group
 
-dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-	modImplementation include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
-}
-
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-var isStable = project.is_stable == "true"
-
-if (System.getenv("MODRINTH")) {
-    modrinth {
-        token = System.getenv("MODRINTH")
-        projectId = 'xZK7iTeY'
-        versionNumber = "" + version
-        versionType = isStable ? "release" : "beta"
-        uploadFile = remapJar
-        gameVersions = [((String) project.minecraft_version)]
-        changelog = System.getenv("CHANGELOG")
-        loaders = ["fabric", "quilt"]
+    repositories {
+        mavenCentral()
     }
 
-    remapJar {
-        finalizedBy project.tasks.modrinth
+    dependencies {
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        mappings loom.officialMojangMappings()
+        modCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+        modLocalRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+        modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    }
+
+    processResources {
+        inputs.property "version", project.version
+
+        filesMatching("fabric.mod.json") {
+            expand "version": inputs.properties.version
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 21
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    jar {
+        from(rootProject.file("LICENSE")) {
+            rename { "${it}_${project.base.archivesName.get()}"}
+        }
+    }
+
+    publishing {
+        publications {
+            create("mavenJava", MavenPublication) {
+                artifactId = project.base.archivesName.get()
+                from components.java
+            }
+        }
     }
 }
