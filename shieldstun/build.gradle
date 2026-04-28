@@ -1,0 +1,16 @@
+base.archivesName = "shieldstun"
+
+loom {
+    mods {
+        "shieldstun" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    api project(path: ":shieldstun-api")
+    include project(path: ":shieldstun-api")
+
+    modImplementation include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
+}
