@@ -2,77 +2,62 @@ package me.libreh.shieldstun.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import me.libreh.shieldstun.ModInit;
+import com.google.gson.JsonSyntaxException;
+import me.libreh.shieldstun.ShieldStun;
 import net.fabricmc.loader.api.FabricLoader;
 
-import java.io.InputStreamReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
 public class ConfigManager {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("shieldstun.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    public static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir();
+    public static final String CONFIG_NAME = "shieldstun.json";
+    public static final Path CONFIG_PATH = CONFIG_DIR.resolve(CONFIG_NAME);
+    private static Config CONFIG;
 
-    private static Config config;
+    public static boolean load() {
+        Config oldConfig = CONFIG;
+        boolean success;
+
+        try (FileReader reader = new FileReader(CONFIG_PATH.toFile())) {
+            Config config = GSON.fromJson(reader, Config.class);
+            if (config == null) {
+                ShieldStun.LOGGER.error("Failed to load " + CONFIG_NAME + ": Config parsed as null");
+                CONFIG = oldConfig;
+                return false;
+            }
+            CONFIG = config;
+            save();
+            success = true;
+        } catch (FileNotFoundException e) {
+            ShieldStun.LOGGER.info("Creating default config " + CONFIG_NAME);
+            CONFIG = new Config();
+            save();
+            success = true;
+        } catch (IOException | JsonSyntaxException e) {
+            ShieldStun.LOGGER.error("Failed to read config " + CONFIG_NAME, e);
+            CONFIG = oldConfig;
+            success = false;
+        }
+
+        return success;
+    }
+
+    public static void save() {
+        try {
+            Files.createDirectories(CONFIG_PATH.getParent());
+            String json = GSON.toJson(CONFIG);
+            Files.writeString(CONFIG_PATH, json);
+        } catch (IOException e) {
+            ShieldStun.LOGGER.error("Failed to save config " + CONFIG_NAME, e);
+        }
+    }
 
     public static Config getConfig() {
-        if (config == null) loadConfig();
-        return config;
-    }
-
-    private static ConfigCache configCache;
-
-    public static ConfigCache getConfigCache() {
-        if (configCache == null) configCache = new ConfigCache();
-        return configCache;
-    }
-
-    public static boolean loadConfig() {
-        try {
-            config = new Config();
-            if (!Files.exists(CONFIG_PATH)) {
-                saveConfig();
-                return true;
-            }
-
-            JsonObject json = GSON.fromJson(new InputStreamReader(Files.newInputStream(CONFIG_PATH)), JsonObject.class);
-            for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
-                ConfigOption<?> option = config.getOption(entry.getKey());
-                if (option != null) {
-                    setOptionValue(option, entry.getValue());
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            ModInit.LOGGER.error("Failed to load config", e);
-            return false;
-        }
-    }
-
-    private static void setOptionValue(ConfigOption<?> option, JsonElement element) {
-        if (option.getType() == Boolean.class && element.isJsonPrimitive()) {
-            ((ConfigOption<Boolean>) option).set(element.getAsBoolean());
-        }
-    }
-
-    public static boolean saveConfig() {
-        try {
-            JsonObject json = new JsonObject();
-            for (ConfigOption<?> option : config.getOptions().values()) {
-                if (option.getType() == Boolean.class) {
-                    json.addProperty(option.getKey(), (Boolean) option.get());
-                }
-            }
-            Files.createDirectories(CONFIG_PATH.getParent());
-            Files.writeString(CONFIG_PATH, GSON.toJson(json));
-            configCache.reload();
-            return true;
-        } catch (Exception e) {
-            ModInit.LOGGER.error("Failed to save config", e);
-            return false;
-        }
+        return CONFIG;
     }
 }

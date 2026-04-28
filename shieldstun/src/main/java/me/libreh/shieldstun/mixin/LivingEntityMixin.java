@@ -1,41 +1,41 @@
 package me.libreh.shieldstun.mixin;
 
-import me.libreh.shieldstun.config.ConfigCache;
-import me.libreh.shieldstun.config.ConfigManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import me.libreh.shieldstun.api.ShieldStunHelper;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
-	@Shadow public abstract float getDamageBlockedAmount(ServerWorld world, DamageSource source, float amount);
+    public LivingEntityMixin(EntityType<?> entityType, Level level) {
+        super(entityType, level);
+    }
 
-	@Shadow public abstract boolean isBlocking();
+    @Unique
+    private boolean blockedHit = false;
 
-	public LivingEntityMixin(EntityType<?> type, World world) {
-		super(type, world);
-	}
+    @WrapOperation(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;applyItemBlocking(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)F"))
+    private float hurtServer(LivingEntity instance, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, Operation<Float> original) {
+        float blockedAmount = original.call(instance, serverLevel, damageSource, damageAmount);
+        blockedHit = ShieldStunHelper.isEnabled() && blockedAmount != 0.0F;
+        return blockedAmount;
+    }
 
-	@Unique
-	private static final ConfigCache CONFIG = ConfigManager.getConfigCache();
-
-	@Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getDamageBlockedAmount(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)F", shift = At.Shift.BEFORE), cancellable = true)
-	private void shieldStun$stunHit(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (CONFIG.isStunEnabled() && this.isBlocking() &&
-				source.getSource() != null && source.getSource() instanceof ServerPlayerEntity
-		) {
-			getDamageBlockedAmount(world, source, amount);
-			cir.setReturnValue(false);
-		}
-	}
+    @ModifyReturnValue(method = "hurtServer", at = @At("RETURN"))
+    private boolean hurtServerReturn(boolean original) {
+        if (blockedHit) {
+            this.invulnerableTime = 0;
+            return false;
+        }
+        return original;
+    }
 }
