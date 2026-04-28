@@ -1,51 +1,57 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
-	id 'maven-publish'
+    id 'fabric-loom' version '1.10-SNAPSHOT' apply false
+    id 'maven-publish'
 }
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version + "+" + project.minecraft_version
-group = project.maven_group
+subprojects {
+    apply plugin: 'fabric-loom'
+    apply plugin: 'maven-publish'
 
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-}
+    version = project.mod_version + "+" + project.minecraft_version
+    group = project.maven_group
 
-dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    repositories {
+        mavenCentral()
+    }
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    dependencies {
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+        modCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+        modLocalRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+        modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+        modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    }
 
-	modImplementation include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
-}
+    processResources {
+        inputs.property "version", project.version
 
-processResources {
-	inputs.property "version", project.version
+        filesMatching("fabric.mod.json") {
+            expand "version": inputs.properties.version
+        }
+    }
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 21
+    }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
-}
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
+    jar {
+        from(rootProject.file("LICENSE")) {
+            rename { "${it}_${project.base.archivesName.get()}"}
+        }
+    }
 
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
+    publishing {
+        publications {
+            create("mavenJava", MavenPublication) {
+                artifactId = project.base.archivesName.get()
+                from components.java
+            }
+        }
+    }
 }
