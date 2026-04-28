@@ -1,78 +1,58 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'maven-publish'
-    id "com.modrinth.minotaur" version "2.+"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
+    id 'maven-publish'
 }
 
-base.archivesName = project.archives_base_name
-version = project.mod_version + "+" + project.minecraft_version
-group = project.maven_group
+subprojects {
+    apply plugin: 'net.fabricmc.fabric-loom'
+    apply plugin: 'maven-publish'
 
-repositories {
-    mavenCentral()
-    maven { url 'https://maven.nucleoid.xyz' }
-    maven { url 'https://maven.supersanta.me/snapshots' }
-}
+    version = project.mod_version + "+" + project.minecraft_version
+    group = project.maven_group
 
-loom {
-    mods {
-        "shieldstun" {
-            sourceSet sourceSets.main
+    repositories {
+        mavenCentral()
+        maven { url 'https://maven.nucleoid.xyz' }
+        maven { url 'https://maven.supersanta.me/snapshots' }
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        compileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+        localRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+        compileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        localRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    }
+
+    processResources {
+        inputs.property "version", project.version
+
+        filesMatching("fabric.mod.json") {
+            expand "version": inputs.properties.version
         }
     }
-}
 
-dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-	implementation project(':shieldstun-api')
-	include project(':shieldstun-api')
-
-    // Mod libraries
-	implementation include("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
-}
-
-java {
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
-}
-
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-if (System.getenv("MODRINTH")) {
-    modrinth {
-        token = System.getenv("MODRINTH")
-        projectId = 'xZK7iTeY'
-        versionNumber = "" + version
-        versionType = "release"
-        uploadFile = remapJar
-        gameVersions = [((String) project.minecraft_version)]
-        changelog = System.getenv("CHANGELOG")
-        loaders = ["fabric", "quilt"]
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 25
     }
 
-    remapJar {
-        finalizedBy project.tasks.modrinth
+    java {
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
+    }
+
+    jar {
+        from(rootProject.file("LICENSE")) {
+            rename { "${it}_${project.base.archivesName.get()}"}
+        }
+    }
+
+    publishing {
+        publications {
+            create("mavenJava", MavenPublication) {
+                artifactId = project.base.archivesName.get()
+                from components.java
+            }
+        }
     }
 }

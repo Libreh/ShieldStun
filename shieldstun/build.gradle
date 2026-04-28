@@ -1,0 +1,39 @@
+plugins {
+    id "com.modrinth.minotaur" version "2.+"
+}
+
+base.archivesName = "shieldstun"
+
+loom {
+    mods {
+        "shieldstun" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    api project(path: ":shieldstun-api")
+    include project(path: ":shieldstun-api")
+
+    compileOnly "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+    localRuntime "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+    include "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+}
+
+if (System.getenv("MODRINTH")) {
+    modrinth {
+        token = System.getenv("MODRINTH")
+        projectId = 'xZK7iTeY'
+        versionNumber = "" + version
+        versionType = "release"
+        uploadFile = jar
+        gameVersions = [((String) project.minecraft_version)]
+        changelog = System.getenv("CHANGELOG")
+        loaders = ["fabric", "quilt"]
+    }
+
+    jar {
+        finalizedBy project.tasks.modrinth
+    }
+}

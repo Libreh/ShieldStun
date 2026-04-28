@@ -10,3 +10,4 @@ pluginManagement {
 }
 
 include 'shieldstun-api'
+include 'shieldstun'
