@@ -1,0 +1,20 @@
+{
+	"schemaVersion": 1,
+	"id": "shieldstun-api",
+	"version": "${version}",
+	"name": "Shield Stun API",
+	"description": "API library for Shield Stun integration",
+	"authors": [
+		"Libreh"
+	],
+	"contact": {
+		"sources": "https://github.com/Libreh/ShieldStun"
+	},
+	"license": "LGPLv3",
+	"environment": "*",
+	"depends": {
+		"fabricloader": ">=0.18",
+		"minecraft": "~1.21.11",
+		"java": ">=21"
+	}
+}
