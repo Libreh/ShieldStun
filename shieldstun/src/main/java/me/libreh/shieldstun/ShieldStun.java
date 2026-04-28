@@ -1,6 +1,7 @@
 package me.libreh.shieldstun;
 
-import me.libreh.shieldstun.command.Commands;
+import me.libreh.shieldstun.api.ShieldStunHelper;
+import me.libreh.shieldstun.command.ShieldStunCommand;
 import me.libreh.shieldstun.config.ConfigManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -13,7 +14,8 @@ public class ShieldStun implements ModInitializer {
 
     @Override
 	public void onInitialize() {
-		ConfigManager.loadConfig();
-		CommandRegistrationCallback.EVENT.register((dispatcher, access, environment) -> Commands.register(dispatcher));
+		ConfigManager.load();
+		ShieldStunHelper.setEnabled(ConfigManager.getConfig().enableStuns);
+		CommandRegistrationCallback.EVENT.register((dispatcher, access, environment) -> ShieldStunCommand.register(dispatcher));
 	}
 }
