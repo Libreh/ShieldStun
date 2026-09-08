@@ -3,6 +3,7 @@ package me.libreh.shieldstun.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import me.libreh.shieldstun.api.ShieldStunHelper;
 import me.libreh.shieldstun.config.ConfigManager;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.loader.api.FabricLoader;
@@ -45,6 +46,7 @@ public class ShieldStunCommand {
 
     private static int reloadConfig(CommandSourceStack source) {
         if (ConfigManager.load()) {
+            ShieldStunHelper.setEnabled(ConfigManager.getConfig().enableStuns);
             source.sendSuccess(Component.literal("Reloaded config!"), false);
         } else {
             source.sendFailure(Component.literal("Failed to reload the config! Check server console for more info.").withStyle(ChatFormatting.RED));
@@ -67,6 +69,7 @@ public class ShieldStunCommand {
     private static int enableStuns(CommandSourceStack source) {
         ConfigManager.getConfig().enableStuns = true;
         ConfigManager.save();
+        ShieldStunHelper.setEnabled(true);
         Component message = STUNS_HAVE.copy().append(ENABLED.copy());
         source.sendSuccess(message, false);
         return Command.SINGLE_SUCCESS;
@@ -75,6 +78,7 @@ public class ShieldStunCommand {
     private static int disableStuns(CommandSourceStack source) {
         ConfigManager.getConfig().enableStuns = false;
         ConfigManager.save();
+        ShieldStunHelper.setEnabled(false);
         Component message = STUNS_HAVE.copy().append(DISABLED.copy());
         source.sendSuccess(message, false);
         return Command.SINGLE_SUCCESS;
