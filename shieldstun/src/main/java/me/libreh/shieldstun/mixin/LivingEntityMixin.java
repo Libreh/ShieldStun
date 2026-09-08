@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.libreh.shieldstun.config.ConfigManager;
+import me.libreh.shieldstun.api.ShieldStunHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -52,7 +52,7 @@ public abstract class LivingEntityMixin extends Entity {
     private float hurtServer(LivingEntity instance, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, Operation<Float> original) {
         float blockedAmount = original.call(instance, serverLevel, damageSource, damageAmount);
         float damageAfterBlocking = damageAmount - blockedAmount;
-        blockedHit = ConfigManager.getConfig().enableStuns && blockedAmount != 0.0F;
+        blockedHit = ShieldStunHelper.isEnabled() && blockedAmount != 0.0F;
 
         stunnedBlock = blockedHit
             && instance instanceof Player
@@ -79,7 +79,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @WrapOperation(method = "applyItemBlocking", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;blockUsingItem(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)V"))
     private void skipShieldDisableWithinIFrames(LivingEntity instance, ServerLevel level, LivingEntity attacker, Operation<Void> original, @Local(argsOnly = true) DamageSource source, @Local(argsOnly = true) float damage, @Local(ordinal = 1) float damageBlocked) {
-        if (ConfigManager.getConfig().enableStuns && absorbedByIFrames(source, damage - damageBlocked)) {
+        if (ShieldStunHelper.isEnabled() && absorbedByIFrames(source, damage - damageBlocked)) {
             return;
         }
         original.call(instance, level, attacker);
