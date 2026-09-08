@@ -24,10 +24,10 @@ jobs:
           restore-keys: |
             gradle-
 
-      - name: setup jdk 25
+      - name: setup jdk 21
         uses: actions/setup-java@v6
         with:
-          java-version: 25
+          java-version: 21
           distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
