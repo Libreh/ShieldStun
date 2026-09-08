@@ -3,7 +3,7 @@ package me.libreh.shieldstun.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.libreh.shieldstun.config.ConfigManager;
+import me.libreh.shieldstun.api.ShieldStunHelper;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -52,7 +52,7 @@ public abstract class LivingEntityMixin extends Entity {
     )
     private boolean hurt(LivingEntity instance, DamageSource damageSource, Operation<Boolean> original) {
         boolean blocked = original.call(instance, damageSource);
-        blockedHit = ConfigManager.getConfig().enableStuns && blocked;
+        blockedHit = ShieldStunHelper.isEnabled() && blocked;
 
         stunnedBlock = blockedHit
             && instance instanceof Player
@@ -85,7 +85,7 @@ public abstract class LivingEntityMixin extends Entity {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;blockUsingShield(Lnet/minecraft/world/entity/LivingEntity;)V")
     )
     private void skipShieldDisableWithinIFrames(LivingEntity instance, LivingEntity attacker, Operation<Void> original, @Local(argsOnly = true) DamageSource source) {
-        if (ConfigManager.getConfig().enableStuns && absorbedByIFrames(source, 0.0F)) {
+        if (ShieldStunHelper.isEnabled() && absorbedByIFrames(source, 0.0F)) {
             return;
         }
         original.call(instance, attacker);
