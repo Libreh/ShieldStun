@@ -1,8 +1,10 @@
 # Shield Stun (Fabric)
 
-Server-side Fabric mod that fixes 2016 Minecraft shield invulnerability tick bug [MC-268147](https://bugs.mojang.com/browse/MC-268147) from 1.11.2.
+Server-side Fabric mod that adds Paper style shield stunning.
 
-This is done by porting Paper's [`skip-vanilla-damage-tick-when-shield-blocked`](https://github.com/PaperMC/Paper/blob/main/paper-server/patches/sources/net/minecraft/world/entity/LivingEntity.java.patch#L1241) setting to Fabric.
+Since 1.11.2 a blocked hit runs a full damage tick, handing the defender invulnerability frames and swallowing the follow-up that used to launch them ([MC-268147](https://bugs.mojang.com/browse/MC/issues/MC-268147)). This mod skips that tick.
+
+It matches Paper's [`skip-vanilla-damage-tick-when-shield-blocked`](https://docs.papermc.io/paper/reference/global-configuration/#unsupported_settings_skip_vanilla_damage_tick_when_shield_blocked), an opt-in under `unsupported-settings` rather than a fix. Skipping the tick was originally a Paper bug, but players got used to stunning with it, so Paper kept it as a setting.
 
 ## Configuration
 
@@ -24,6 +26,7 @@ The config file is located at `config/shieldstun.json`. It controls whether shie
 | /shieldstun disable | shieldstun.disable (or op 3) | Disable the mod    |
 
 ## What this mod doesn't do
+
 This mod does not enable shield stunning for fake players like those found in [Carpet](https://github.com/gnembon/fabric-carpet).
 If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [CarpetPvP](https://github.com/TheobaldTheBird/CarpetPVP) mod, type:
 
