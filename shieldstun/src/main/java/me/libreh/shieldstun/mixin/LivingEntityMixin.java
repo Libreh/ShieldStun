@@ -28,6 +28,9 @@ public abstract class LivingEntityMixin extends Entity {
     @Shadow
     protected float lastHurt;
 
+    @Shadow
+    public int damageCooldownTime;
+
     @Unique
     private boolean blockedHit = false;
 
@@ -35,7 +38,7 @@ public abstract class LivingEntityMixin extends Entity {
     private boolean stunnedBlock = false;
 
     @Unique
-    private int invulnerableTimeBefore = 0;
+    private int damageCooldownTimeBefore = 0;
 
     @Unique
     private float lastHurtBefore = 0.0F;
@@ -43,7 +46,7 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "hurtServer", at = @At("HEAD"))
     private void beforeHurt(ServerLevel level, DamageSource source, float damage, CallbackInfoReturnable<Boolean> cir) {
         blockedHit = false;
-        invulnerableTimeBefore = this.invulnerableTime;
+        damageCooldownTimeBefore = this.damageCooldownTime;
         lastHurtBefore = this.lastHurt;
     }
 
@@ -62,7 +65,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Unique
     private boolean absorbedByIFrames(DamageSource source, float damageAfterBlocking) {
-        return this.invulnerableTime > 10.0F
+        return this.damageCooldownTime > 10.0F
             && !source.is(DamageTypeTags.BYPASSES_COOLDOWN)
             && damageAfterBlocking <= this.lastHurt;
     }
@@ -70,17 +73,17 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V", ordinal = 1, shift = At.Shift.AFTER), cancellable = true)
     private void skipDamageTick(ServerLevel level, DamageSource source, float damage, CallbackInfoReturnable<Boolean> cir) {
         if (stunnedBlock) {
-            this.invulnerableTime = invulnerableTimeBefore;
+            this.damageCooldownTime = damageCooldownTimeBefore;
             this.lastHurt = lastHurtBefore;
             cir.setReturnValue(false);
         }
     }
 
-    @WrapOperation(method = "applyItemBlocking", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;blockUsingItem(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/damagesource/DamageSource;F)V"))
-    private void skipShieldDisableWithinIFrames(LivingEntity instance, ServerLevel level, LivingEntity attacker, DamageSource source, float damage, Operation<Void> original, @Local(ordinal = 1) float damageBlocked) {
+    @WrapOperation(method = "applyItemBlocking", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;blockUsingItem(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/damagesource/DamageSource;FZ)V"))
+    private void skipShieldDisableWithinIFrames(LivingEntity instance, ServerLevel level, LivingEntity attacker, DamageSource source, float damage, boolean fullyBlocked, Operation<Void> original, @Local(ordinal = 1) float damageBlocked) {
         if (ShieldStunHelper.isEnabled() && absorbedByIFrames(source, damage - damageBlocked)) {
             return;
         }
-        original.call(instance, level, attacker, source, damage);
+        original.call(instance, level, attacker, source, damage, fullyBlocked);
     }
 }
