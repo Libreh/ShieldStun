@@ -1,14 +1,14 @@
 # Shield Stun (Fabric)
 
-Server-side Fabric mod that adds Paper style shield stunning.
+Server-side Fabric mod that adds Paper's shield stunning.
 
 Since 1.11.2 a blocked hit runs a full damage tick, handing the defender invulnerability frames and swallowing the follow-up that used to launch them ([MC-268147](https://bugs.mojang.com/browse/MC/issues/MC-268147)). This mod skips that tick.
 
-It matches Paper's [`skip-vanilla-damage-tick-when-shield-blocked`](https://docs.papermc.io/paper/reference/global-configuration/#unsupported_settings_skip_vanilla_damage_tick_when_shield_blocked), an opt-in under `unsupported-settings` rather than a fix. Skipping the tick was originally a Paper bug, but players got used to stunning with it, so Paper kept it as a setting.
+It matches Paper's [`skip-vanilla-damage-tick-when-shield-blocked`](https://docs.papermc.io/paper/reference/global-configuration/#unsupported_settings_skip_vanilla_damage_tick_when_shield_blocked). Skipping the tick was originally a Paper bug, but players got used to stunning with it.
 
 ## Configuration
 
-The config file is located at `config/shieldstun.json`. It controls whether shield stuns are applied.
+The config file is located at `config/shieldstun.json`.
 ```json
 {
   "enable_stuns": true
@@ -35,4 +35,4 @@ If you are using [TheobaldTheBird](https://github.com/TheobaldTheBird)'s [Carpet
 This will **temporarily** enable shieldStunning for fake players.
 If you want it to be **permanent**, click the text that says '[Change permanently?]'.
 
-This mod also doesn't enable stunning on Paper servers that have shield stunning disabled.
+This mod also doesn't enable stunning for Fabric clients on Paper servers that have shield stunning disabled.
